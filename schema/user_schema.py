@@ -20,6 +20,7 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     user_name :str
     user_email : EmailStr
+    user_id : int
     
 
     

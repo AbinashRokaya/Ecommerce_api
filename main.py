@@ -8,6 +8,8 @@ from route import user_route
 from route import login_route
 from route import category_route
 from route import product_route
+from route import order_route
+from route import cart_route
 
 from model.user_model import User
 from model.cart_model import Cart
@@ -28,6 +30,8 @@ app.include_router(user_route.router)
 app.include_router(login_route.router)
 app.include_router(category_route.router)
 app.include_router(product_route.router)
+app.include_router(order_route.router)
+app.include_router(cart_route.router)
 
 
 

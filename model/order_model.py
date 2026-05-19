@@ -7,7 +7,7 @@ class Order(Base):
     __tablename__ = "order"
 
     order_id = Column(Integer,primary_key=True,autoincrement=True)
-    order_amount = Column(DECIMAL)
+    order_amount = Column(Integer)
     order_user_id = Column(Integer,ForeignKey("users.user_id"))
 
     order_created_at = Column(DateTime,server_default=func.now())
@@ -30,7 +30,7 @@ class OrderItem(Base):
 
     quantity = Column(Integer)
 
-    price = Column(DECIMAL)
+    price = Column(Integer)
 
     order_rel = relationship("Order", back_populates="order_item_rel")
 

@@ -10,6 +10,7 @@ def get_current_user(token:str=Depends(oauth2_scheme)):
     payload = verify_token(token=token)
     user_name = payload.get("user_name")
     user_email = payload.get("user_email")
+    user_id = payload.get("user_id")
     # print(user_email,user_name)
 
     if user_name is None:
@@ -23,4 +24,4 @@ def get_current_user(token:str=Depends(oauth2_scheme)):
             detail="Invalid authentication credentials",
         )
     # print(user_email,user_name)
-    return TokenData(user_name=user_name,user_email=user_email)
+    return TokenData(user_name=user_name,user_email=user_email,user_id=user_id)

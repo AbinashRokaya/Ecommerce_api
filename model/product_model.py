@@ -9,7 +9,7 @@ class Product(Base):
 
     product_id = Column(Integer,primary_key=True,autoincrement=True)
     product_name = Column(String(50),nullable=False)
-    product_price = Column(DECIMAL,nullable=False)
+    product_price = Column(Integer,nullable=False)
     product_description = Column(String(250))
     product_category = Column(Integer,ForeignKey("category.category_id"))
     product_quantity = Column(Integer,default=0)
