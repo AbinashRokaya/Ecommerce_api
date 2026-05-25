@@ -1,7 +1,8 @@
-from sqlalchemy import Column,String,Integer,ForeignKey,DateTime
+from sqlalchemy import Column,String,Integer,ForeignKey,DateTime,Enum
 from database.database import Base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+from schema.user_schema import Role_schema
 
 class User(Base):
     __tablename__ = "users"
@@ -11,6 +12,7 @@ class User(Base):
     user_address = Column(String(50),nullable=False)
     user_email = Column(String(50),nullable=False)
     password = Column(String(255),nullable=False)
+    user_role = Column(Enum(Role_schema),default=Role_schema.User)
 
     user_created_at = Column(DateTime,server_default=func.now())
     user_updated_at = Column(DateTime,server_default=func.now(),onupdate=func.now())

@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Depends, HTTPException, status,APIRouter
+from fastapi import FastAPI, Depends, HTTPException, status,APIRouter,Response
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from auth.jwt import create_access_token
-from schema.user_schema import Token
+from schema.user_schema import Token,LoginRequest,TokenData
 from auth.current_user import get_current_user
 from model.user_model import User
 from database.database import get_db
@@ -16,7 +16,7 @@ router = APIRouter(
 )
  
 @router.post("/")
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login_for_access_token(form_data: LoginRequest,response:Response, db: Session = Depends(get_db)):
     try:
 
         user = db.query(User).filter(User.user_name==form_data.username).first()
@@ -32,8 +32,22 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
                 detail="Incorrect username or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        access_token = create_access_token(data={"user_name": user.user_name,"user_email":user.user_email,"user_id":user.user_id})
-        return {"access_token": access_token, "token_type": "bearer"}
+        user_data=TokenData(user_name=user.user_name,
+                            user_email=user.user_email,
+                            user_id=user.user_id,
+                            user_role=user.user_role)
+        access_token = create_access_token(data={"user_name": user.user_name,"user_email":user.user_email,"user_id":user.user_id,"user_role":user.user_role})
+        response.set_cookie(
+    key="access_token",
+    value=access_token,
+    httponly=True,
+    max_age=3600,
+    samesite="lax",
+    secure=False,
+    path="/",
+)
+
+        return {"user_detail":user_data,"access_token":access_token}
     
     except HTTPException:
         raise

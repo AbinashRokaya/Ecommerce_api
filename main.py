@@ -18,7 +18,7 @@ from model.order_model import Order
 from model.product_model import Product
 from model.payment_model import Payment
 
-
+from fastapi.middleware.cors import CORSMiddleware
 
 
 
@@ -26,6 +26,14 @@ from model.payment_model import Payment
 
 app=FastAPI()
 
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(user_route.router)
 app.include_router(login_route.router)
 app.include_router(category_route.router)
@@ -38,4 +46,4 @@ app.include_router(cart_route.router)
 
 
 if __name__=="__main__":
-    uvicorn.run("main:app",host="127.0.0.1",port=8000,reload=True,loop="asyncio")
+    uvicorn.run("main:app",host="localhost",port=8000,reload=True)
