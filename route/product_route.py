@@ -184,3 +184,31 @@ def get_product(id:int,db:Session=Depends(get_db),current_user= Depends(require_
         raise
     except Exception as e:
         raise HTTPException(status_code=500,detail=f"{e}")
+
+
+@router.delete("/{id}")
+def delete_product(id:int,db:Session=Depends(get_db),current_user= Depends(require_permission("edit"))):
+    try:
+        product = db.query(Product).filter(Product.product_id==id).first()
+        
+        if not product:
+            raise HTTPException(status_code=404,detail=f"product id {id} not found")
+        
+        db.delete(product)
+        db.commit()
+        
+        return JSONResponse(
+                status_code=200,
+                content={
+                    "success": True,
+                    "status_code": 200,
+                    "message": f"{id} product deleted",
+                    "data": ""
+                }
+            )
+
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500,detail=f"{e}")

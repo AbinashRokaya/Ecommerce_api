@@ -25,24 +25,33 @@ def create_cart(request:CartItemRequest,db:Session=Depends(get_db),current_user=
         if not product:
             raise HTTPException(status_code=404,detail="product not found")
         
-        cart_user = db.query(Cart).filter(Cart.cart_user_id==current_user.user_id).first()
-        
-        if not cart_user:
-            cart_user = Cart(
-                cart_user_id = current_user.user_id
-            )
-            db.add(cart_user)
-            db.commit()
-            db.refresh(cart_user)
+        cart_item=db.query(CartItem).filter(CartItem.product_id==product.product_id).first()
 
-        cart_item = CartItem(
-            cart_id = cart_user.cart_id,
-            product_id = request.product_id,
-            quantity = request.quantity
-        )
-        db.add(cart_item)
-        db.commit()
-        db.refresh(cart_item)
+        cart_user = db.query(Cart).filter(Cart.cart_user_id==current_user.user_id).first()
+        if not cart_item:
+
+            
+            if not cart_user:
+                cart_user = Cart(
+                    cart_user_id = current_user.user_id
+                )
+                db.add(cart_user)
+                db.commit()
+                db.refresh(cart_user)
+
+            cart_item = CartItem(
+                cart_id = cart_user.cart_id,
+                product_id = request.product_id,
+                quantity = request.quantity
+            )
+            db.add(cart_item)
+            db.commit()
+            db.refresh(cart_item)
+        else:
+            cart_item.quantity=request.quantity
+
+            db.commit()
+            db.refresh(cart_item)
 
         cart_response = CartResponse(
             cart_id = cart_user.cart_id,

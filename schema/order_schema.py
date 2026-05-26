@@ -19,11 +19,11 @@ class OrderResponse(BaseModel):
     order_user_id : int
 
 class OrderItemResponse(BaseModel):
-    order_item_id : int
-    order_id : int
-    product_id : int
-    quantity : int
-    price : int
+    id : Optional[int]=None
+    order_id : Optional[int]=None
+    product_id : Optional[int] = None
+    quantity :Optional[int]=None
+    price : Optional[int]=None
 
 class orderItemResponseList(BaseModel):
     order : OrderResponse

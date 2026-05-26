@@ -4,7 +4,7 @@ from schema.order_schema import (OrderRequest,OrderItemRequest,
                                  OrderItemRequestList,OrderItemResponse,
                                  OrderResponse,orderItemResponseList,
                                  GetOrderIResponseList)
-from auth.current_user import get_current_user
+from auth.current_user import get_current_user,require_permission
 from database.database import get_db
 from sqlalchemy.orm import Session
 from model.product_model import Product
@@ -19,7 +19,7 @@ router =  APIRouter(
 )
 
 @router.post("/")
-def create_order(request:OrderItemRequestList,db:Session=Depends(get_db),current_user= Depends(get_current_user)):
+def create_order(request:OrderItemRequestList,db:Session=Depends(get_db),current_user= Depends(require_permission("view"))):
     
     try:
         for item in request.order_items:
@@ -30,7 +30,8 @@ def create_order(request:OrderItemRequestList,db:Session=Depends(get_db),current
 
             if not item.quantity<=product.product_quantity:
                 raise HTTPException(status_code=400,detail=f"product {product.product_name} access the limit")
-            
+        
+        print(current_user.user_id)
 
         order = Order(
             order_amount = 0,
@@ -61,6 +62,7 @@ def create_order(request:OrderItemRequestList,db:Session=Depends(get_db),current
             db.add(order_item)
             db.commit()
             db.refresh(order_item)
+            
             created_order_items.append(order_item)
 
 
@@ -74,7 +76,7 @@ def create_order(request:OrderItemRequestList,db:Session=Depends(get_db),current
         order_user_id = order.order_user_id
         )
         order_item = [OrderItemResponse(
-            order_item_id = o.id,
+    id = o.id,
         order_id = o.order_id,
         product_id = o.product_id,
         quantity = o.quantity,
@@ -104,7 +106,7 @@ def create_order(request:OrderItemRequestList,db:Session=Depends(get_db),current
         raise HTTPException(status_code=500,detail=f"{e}")
 
 @router.get("/me")
-def get_order_me(db:Session=Depends(get_db),current_user= Depends(get_current_user)):
+def get_order_me(db:Session=Depends(get_db),current_user= Depends(require_permission("view"))):
     try:
         orders = db.query(Order).filter(Order.order_user_id==current_user.user_id).all()
 
@@ -119,7 +121,7 @@ def get_order_me(db:Session=Depends(get_db),current_user= Depends(get_current_us
             order_user_id = order.order_user_id
             )
             order_item = [OrderItemResponse(
-                order_item_id = o.id,
+                id = o.id,
             order_id = o.order_id,
             product_id = o.product_id,
             quantity = o.quantity,
@@ -150,7 +152,7 @@ def get_order_me(db:Session=Depends(get_db),current_user= Depends(get_current_us
         raise HTTPException(status_code=500,detail=f"{e}")
 
 @router.get("/all")
-def get_order_me(db:Session=Depends(get_db),current_user= Depends(get_current_user)):
+def get_order_me(db:Session=Depends(get_db),current_user= Depends(require_permission("edit"))):
     try:
         orders = db.query(Order).all()
     
@@ -165,7 +167,7 @@ def get_order_me(db:Session=Depends(get_db),current_user= Depends(get_current_us
             order_user_id = order.order_user_id
             )
             order_item = [OrderItemResponse(
-                order_item_id = o.id,
+            id = o.id,
             order_id = o.order_id,
             product_id = o.product_id,
             quantity = o.quantity,
