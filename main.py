@@ -29,7 +29,7 @@ app=FastAPI()
 Base.metadata.create_all(bind=engine)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173",'https://ecommerce-api-kd57.onrender.com'],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
