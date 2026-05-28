@@ -35,11 +35,11 @@ def create_user(request:UserRequest,db:Session=Depends(get_db)):
         db.commit()
         db.refresh(new_user)
 
-        user_response = json.dump(UserResponse(
+        user_response = UserResponse(
             user_name = new_user.user_name,
             user_address = new_user.user_address,
             user_email = new_user.user_email
-        ))
+        )
 
         return JSONResponse(
             status_code=201,
@@ -47,7 +47,7 @@ def create_user(request:UserRequest,db:Session=Depends(get_db)):
                 "success": True,
                 "status_code": 201,
                 "message": "new user is created",
-                "data": user_response
+                "data": user_response.model_dump()
             }
         )
     except HTTPException:

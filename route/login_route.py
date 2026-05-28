@@ -53,3 +53,8 @@ def login_for_access_token(form_data: LoginRequest,response:Response, db: Sessio
         raise
     except Exception as e:
         raise HTTPException(status_code=500,detail=f"{e}")
+
+@router.get("/")
+def logout(response: Response):
+    response.delete_cookie(key="session_id")
+    return {"message": "Successfully logged out"}

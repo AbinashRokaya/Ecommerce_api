@@ -41,7 +41,9 @@ def create_product(request:ProductRequest,db:Session=Depends(get_db),current_use
     product_price =new_product.product_price,
     product_description = new_product.product_description,
     product_category = new_product.product_category,
-    product_quantity = new_product.product_quantity
+    product_quantity = new_product.product_quantity,
+    product_category_name=new_product.category_rel.category_name
+
         )
 
         return JSONResponse(
@@ -85,7 +87,8 @@ def create_product(id:int,request:ProductRequest,db:Session=Depends(get_db),curr
     product_price =product.product_price,
     product_description = product.product_description,
     product_category = product.product_category,
-    product_quantity = product.product_quantity
+    product_quantity = product.product_quantity,
+     product_category_name=product.category_rel.category_name
         )
 
         return JSONResponse(
@@ -122,7 +125,8 @@ def get_product(db:Session=Depends(get_db),current_user= Depends(require_permiss
     product_price =p.product_price,
     product_description = p.product_description,
     product_category = p.product_category,
-    product_quantity = p.product_quantity
+    product_quantity = p.product_quantity,
+     product_category_name=p.category_rel.category_name
             )for p in products
 
         ]
@@ -162,7 +166,8 @@ def get_product(id:int,db:Session=Depends(get_db),current_user= Depends(require_
     product_price =products.product_price,
     product_description = products.product_description,
     product_category = products.product_category,
-    product_quantity = products.product_quantity
+    product_quantity = products.product_quantity,
+     product_category_name=products.category_rel.category_name
             )
 
         ]

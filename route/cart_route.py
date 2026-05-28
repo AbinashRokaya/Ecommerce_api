@@ -61,7 +61,11 @@ def create_cart(request:CartItemRequest,db:Session=Depends(get_db),current_user=
             id = cart_item.id,
             cart_id = cart_item.cart_id,
             product_id = cart_item.product_id,
+    
             quantity =  cart_item.quantity,
+            product_name = cart_item.product_rel.product_name,
+            product_price=cart_item.product_rel.product_price,
+            product_quantity=cart_item.product_rel.product_quantity
         )]
 
         list_cart = CartItemResponseList(
@@ -110,6 +114,9 @@ def get_cart_me(db:Session=Depends(get_db),current_user= Depends(get_current_use
             cart_id = cart_item.cart_id,
             product_id = cart_item.product_id,
             quantity =  cart_item.quantity,
+            product_name = cart_item.product_rel.product_name,
+            product_price=cart_item.product_rel.product_price,
+            product_quantity=cart_item.product_rel.product_quantity
         )for cart_item in cart_items]
 
         list_cart = CartItemResponseList(

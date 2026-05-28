@@ -19,6 +19,9 @@ class CartItemResponse(BaseModel):
     id : int
     cart_id : int
     product_id : int
+    product_name:str
+    product_price:int
+    product_quantity:int
     quantity : int
 
 class CartItemResponseList(BaseModel):
