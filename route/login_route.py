@@ -42,8 +42,8 @@ def login_for_access_token(form_data: LoginRequest,response:Response, db: Sessio
     value=access_token,
     httponly=True,
     max_age=3600,
-    samesite="lax",
-    secure=False,
+    samesite="none",
+    secure=True,
     path="/",
 )
 

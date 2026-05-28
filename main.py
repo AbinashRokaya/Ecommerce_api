@@ -25,11 +25,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 app=FastAPI()
-
+origins = [
+    "http://localhost:5173",
+    "https://marvelous-sopapillas-dfe643.netlify.app",
+]
 Base.metadata.create_all(bind=engine)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173",'https://ecommerce-api-kd57.onrender.com'],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
