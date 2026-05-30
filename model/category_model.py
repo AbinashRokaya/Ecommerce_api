@@ -10,6 +10,7 @@ class Category(Base):
     category_id = Column(Integer,primary_key=True,autoincrement=True)
     category_name = Column(String(50),nullable=False)
     category_description = Column(String(250))
+    category_image_url=Column(String,default=None)
 
     category_created_at = Column(DateTime,server_default=func.now())
     category_updated_at = Column(DateTime,server_default=func.now(),onupdate=func.now())

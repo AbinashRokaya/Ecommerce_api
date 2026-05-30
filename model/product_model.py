@@ -13,6 +13,7 @@ class Product(Base):
     product_description = Column(String(250))
     product_category = Column(Integer,ForeignKey("category.category_id"))
     product_quantity = Column(Integer,default=0)
+    product_image_url =Column(String,default=None)
 
     product_created_at = Column(DateTime,server_default=func.now())
     product_updated_at = Column(DateTime,server_default=func.now(),onupdate=func.now())

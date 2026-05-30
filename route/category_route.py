@@ -1,12 +1,30 @@
-from fastapi import APIRouter,Depends,HTTPException
+from fastapi import APIRouter,Depends,HTTPException,UploadFile,File
 from fastapi.responses import JSONResponse
 import json
-from schema.category_schema import CategoryRequest,CategoryResponse,CategoryResponseList
+from schema.category_schema import CategoryRequest,CategoryResponse,CategoryResponseList,CategoryImageResponse
 from auth.current_user import get_current_user,require_permission
 from sqlalchemy.orm import Session
 from model.category_model import Category
 from schema.user_schema import TokenData
 from database.database import get_db
+
+import os
+import shutil
+import uuid
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+cloudinary.config( 
+    cloud_name = os.getenv("CLOUD_NAME"), 
+    api_key =os.getenv("API_KEY"), 
+    api_secret = os.getenv("API_SECRET"),
+    secure=True
+)
 
 
 router =  APIRouter(
@@ -24,16 +42,20 @@ def create_category(request:CategoryRequest,db:Session=Depends(get_db),current_u
         
         new_category = Category(
             category_name = request.category_name,
-            category_description = request.category_description
+            category_description = request.category_description,
+            category_image_url=request.category_image_url
+
         )
 
         db.add(new_category)
         db.commit()
         db.refresh(new_category)
+
         product_res = CategoryResponse(
-           category_id=category.category_id,
-    category_name=category.category_name,
-    category_description=category.category_description
+           category_id=new_category.category_id,
+    category_name=new_category.category_name,
+    category_description=new_category.category_description,
+    category_image_url=new_category.category_image_url
 
         )
 
@@ -106,7 +128,8 @@ def get_category(db:Session=Depends(get_db),current_user= Depends(require_permis
             CategoryResponse(
                 category_id=c.category_id,
     category_name=c.category_name,
-    category_description=c.category_description
+    category_description=c.category_description,
+    category_image_url=c.category_image_url
 
 
             )for c in category
@@ -140,7 +163,8 @@ def get_product(id:int,db:Session=Depends(get_db),current_user= Depends(require_
             CategoryResponse(
             category_id=category.category_id,
             category_name = category.category_name,
-            category_description = category.category_description
+            category_description = category.category_description,
+            category_image_url=category.category_image_url
             )
 
         ]
@@ -190,3 +214,50 @@ def delete_category(id:int,db:Session=Depends(get_db),current_user= Depends(requ
     except Exception as e:
         raise HTTPException(status_code=500,detail=f"{e}")
     
+
+
+@router.post("/upload")
+async def upload_image_category(file:UploadFile=File(...)):
+    try:
+        allowed_types = ["jpeg", "png", "gif", "webp"]
+        
+        ext=file.filename.split(".")[-1]
+        if ext not in allowed_types:
+            raise HTTPException(status_code=400,detail=f"{file.content_type} is not allowed")
+        
+    
+        unique_name=f"{uuid.uuid4()}.{ext}"
+        file_location=f"uploads/{unique_name}"
+        file_content = await file.read()
+
+        
+        upload_result = cloudinary.uploader.upload(
+            file_content,        
+            public_id=f"category_{uuid.uuid4().hex}" 
+        )
+        
+       
+        cloud_url = upload_result.get("secure_url")
+        unique_name = upload_result.get("public_id")
+
+        
+
+        image_detail = CategoryImageResponse(
+            original_name=file.filename,
+            saved_as=unique_name,
+            url=cloud_url,
+            type=file.content_type
+        )
+        return JSONResponse(
+                        status_code=200,
+                        content={
+                            "success": True,
+                            "status_code": 200,
+                            "message": "successfully upload image",
+                            "data": image_detail.model_dump()
+                        }
+                    )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500,detail=f"{e}")

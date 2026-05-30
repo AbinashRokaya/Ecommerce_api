@@ -4,13 +4,21 @@ from typing import Optional,List
 class CategoryRequest(BaseModel):
     category_name:str=Field(max_length=50)
     category_description:Optional[str]=Field(max_length=250)
+    category_image_url:str
 
 
 class CategoryResponse(BaseModel):
     category_id:int
     category_name:str
     category_description:str
+    category_image_url:str|None=None
 
 class CategoryResponseList(BaseModel):
     category_list:List[CategoryResponse]
+
+class CategoryImageResponse(BaseModel):
+    original_name: str
+    saved_as: str
+    url: str
+    type: str
     
